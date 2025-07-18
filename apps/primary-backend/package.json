@@ -1,0 +1,25 @@
+{
+  "name": "primary-backend",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "dev": "nodemon --ext ts --exec ts-node src/index.ts",
+    "start": "node dist/index.js",
+    "build": "tsc"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "dependencies": {
+    "@repo/redis": "workspace:^",
+    "@types/express": "^5.0.3",
+    "express": "^5.1.0",
+    "redis": "^5.6.0"
+  },
+  "devDependencies": {
+    "@repo/typescript-config": "workspace:^",
+    "nodemon": "^3.1.10",
+    "ts-node": "^10.9.2"
+  }
+}
