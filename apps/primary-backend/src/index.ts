@@ -1,10 +1,23 @@
 import express, { Request, Response } from "express";
 import redisClient from "@repo/redis"; // client object
 
-const PORT = 6000;
+const PORT = 3010;
 const app = express();
 
+// middleware
 app.use(express.json());
+
+// cors
+app.use((req, res, next) => {
+  res.setHeader("Access-Control-Allow-Origin", "*");
+  res.setHeader("Access-Control-Allow-Methods", "GET, POST, PUT, DELETE");
+  res.setHeader("Access-Control-Allow-Headers", "Content-Type");
+  res.setHeader("Access-Control-Allow-Credentials", "true");
+  if (req.method === "OPTIONS") {
+    res.sendStatus(204);
+  }
+  next();
+});
 
 async function main() {
   app.listen(PORT, () => {
@@ -35,7 +48,7 @@ app.post("/posts", async (req: Request, res: Response) => {
     );
 
     // posting request initiaited
-    return res.json({ success: true, message: "Posting Post" }).status(200);
+    return res.json({ success: true, message: "Posting Post..." }).status(200);
   } catch (error) {
     console.error("Error publishing message:", error);
     return res.json({ success: false, message: error }).status(400);
