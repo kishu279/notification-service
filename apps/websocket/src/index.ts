@@ -10,7 +10,8 @@ const CHANNEL = "POSTS";
 const connectionsByRoom: Map<string, Set<WebSocket>> = new Map();
 const userIdByRoom: Map<string, Set<string>> = new Map();
 const connectionToUser: Map<string, WebSocket> = new Map();
-const userIdToRoom: Map<string, string> = new Map();
+const userIdToRoomId: Map<string, string> = new Map(); // roomId to userId
+const userToConnection: Map<WebSocket, string> = new Map();
 
 const pendingNotifications: Map<string, Set<any>> = new Map();
 
@@ -50,7 +51,7 @@ async function handleRedisMessage(parsedData: any) {
   switch (type) {
     case "notification":
       // 1. user related updates
-      const userWs = connectionToUser.get(userId);
+      const userWs = connectionToUser.get(userId); // get ws
       // console.log("User WebSocket:", userWs);
       console.log("User ID:", userId);
       if (userWs) {
@@ -68,6 +69,7 @@ async function handleRedisMessage(parsedData: any) {
       }
 
       // 2. post related updates
+      //
       // to all the users friend or in the room
       break;
     case "chat":
@@ -96,6 +98,25 @@ wss.on("connection", (ws: WebSocket) => {
   });
   ws.on("close", () => {
     console.log("WebSocket connection closed");
+    // remove the connection from the map
+    const userId = userToConnection.get(ws);
+
+    const roomId = userIdToRoomId.get(userId!);
+    connectionsByRoom.get(roomId!)?.delete(ws); // remove from room
+    userIdByRoom.get(roomId!)?.delete(userId!); // remove from userIdByRoom
+    connectionToUser.delete(userId!); // remove from connectionToUser
+    userIdToRoomId.delete(userId!); // remove from userIdToRoomId
+    userToConnection.delete(ws); // remove from userToConnection
+
+    // all connections clear in the room with user
+    console.log(`User ${userId} disconnected from room ${roomId}`);
+    console.log(
+      "User connections in room after disconnect:",
+      connectionsByRoom.get(roomId!)?.size
+    );
+
+    console.log("### DEBUG ###");
+    console.log("User Id By Room: ", userIdByRoom.get(roomId!));
   });
 
   // handle incoming messages
@@ -116,7 +137,8 @@ wss.on("connection", (ws: WebSocket) => {
           userIdByRoom.set(roomId, new Set());
         }
         userIdByRoom.get(roomId)?.add(userId);
-        userIdToRoom.set(roomId, userId);
+        userIdToRoomId.set(roomId, userId);
+        userToConnection.set(ws, userId);
 
         console.log(`User ${userId} joined room ${roomId}`);
         console.log(

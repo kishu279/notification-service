@@ -1,4 +1,4 @@
-import PostForm from "@/components/form/post-form";
+import Link from "next/link";
 
 export default function Home() {
   return (
@@ -8,7 +8,11 @@ export default function Home() {
           <h1 className="text-3xl font-bold text-blue-600 text-center mb-12">
             INSTA-TANIYA
           </h1>
-          <PostForm />
+          <p className="text-2xl">...</p>
+        </div>
+        <div>
+          <p className="text-2xl">Go To Posts Section</p>
+          <Link href={"/post"}>posts</Link>
         </div>
       </div>
     </main>
