@@ -43,7 +43,7 @@ app.post("/posts", async (req: Request, res: Response) => {
   try {
     // push into the queue
     await redisClient.lPush(
-      "posts",
+      "INSTA_POSTS",
       JSON.stringify({ userId, content, contentType })
     );
 
